@@ -10,14 +10,28 @@ module.exports = {
     },
     async create(req, res, next){
         try {
-            const {macAddrress, id} = req.body
-            
-            await knex('bracelets').insert({
-                macAddrress: macAddrress,
-                profileId: id
+            const {macAddress, username} = req.body
+            let id = 0
+            await knex('profiles').where({
+                profileName: username,
+            }).then((data) => {
+                console.log(id)
+                id = data[0].profileId
+                console.log(data)
             })
 
-            return res.status(201).send('Bracelet  ' + macAddrress + '  connected.')
+            if(id != 0 && id != null){
+                await knex('bracelets').insert({
+                    macAddress: macAddress,
+                    profileId: id
+                })
+
+                return res.status(201).send('Bracelet is ' + macAddress + '  connected.')
+            } else {
+                return res.status(500).send('Bracelet  ' + macAddress + ' was not connected.')
+            }
+
+            
         } catch (error) {
             next(error)
         }

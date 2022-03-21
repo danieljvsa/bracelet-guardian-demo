@@ -6,23 +6,23 @@ const BraceletController = require('./controllers/BraceletsControllers')
 const NursesController = require('./controllers/NursesControllers')
 const PatientsController = require('./controllers/PatientsControllers')
 
-routes.get('/', ProfileController.index)
-routes.get('/get-profiles', ProfileController.get)
-routes.post('/add-profile', ProfileController.create)
-routes.put('/profiles/:id', ProfileController.update)
-routes.delete('/profiles/:id', ProfileController.delete)
+routes.get('/', ProfileController.index) //web routes
+routes.get('/get-profiles', ProfileController.get) //web routes
+routes.post('/add-profile', ProfileController.create) //web routes
+routes.put('/profiles/:id', ProfileController.update) //web routes
+routes.delete('/profiles/:id', ProfileController.delete) //web routes
 
-routes.get('/get-bracelet', BraceletController.get)
-routes.post('/add-bracelet', BraceletController.create)
-routes.delete('/bracelets/:id', BraceletController.delete)
+routes.get('/get-bracelet', BraceletController.get) //web routes
+routes.post('/add-bracelet', BraceletController.create) //esp32 routes
+routes.delete('/bracelets/:id', BraceletController.delete) //web routes
 
-routes.get('/get-nurses', NursesController.get)
-routes.post('/add-nurse', NursesController.create)
-routes.put('/nurses/:id', NursesController.update)
-routes.delete('/nurses/:id', NursesController.delete)
+routes.get('/get-nurses', NursesController.get) //web routes
+routes.post('/add-nurse', NursesController.create) //web routes
+routes.put('/nurses/:id', NursesController.update) //web routes
+routes.delete('/nurses/:id', NursesController.delete) //web routes
 
-routes.get('/patients/:id', PatientsController.get)
-routes.post('/patients/:id', PatientsController.create)
-routes.delete('/patients/:id', PatientsController.delete)
+routes.get('/patients/:id', PatientsController.get) //web routes
+routes.post('/patients', PatientsController.create) //esp32 routes
+routes.delete('/patients', PatientsController.delete) //web routes
 
 module.exports = routes;
