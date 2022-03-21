@@ -1,4 +1,5 @@
 const knex = require('../database')
+require('dotenv').config()
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
@@ -14,15 +15,17 @@ module.exports = {
     },
     async create(req, res, next){
         let isValid = false
+        let id = 0
         let phones = []
         try {
             const {level, locationX, locationY, macAddress} = req.body
-            const {id} = req.params
+            //const {id} = req.params
 
             if(macAddress != ''){
-                await knex('bracelets').where({profileId: id, macAddress: macAddress}).then((data) => {
+                await knex('bracelets').where({macAddress: macAddress}).then((data) => {
                     if(data.braceletId != 0){
                         isValid = true
+                        id = data.profileId
                     } else{
                         res.send('Bracelet is not valid.')
                     }
@@ -65,7 +68,20 @@ module.exports = {
 
     async delete(req, res, next){
         try {
-            const {id} = req.params
+            //const {id} = req.params
+            let id = 0
+            const {macAddress} = req.body
+
+            if(macAddress != ''){
+                await knex('bracelets').where({macAddress: macAddress}).then((data) => {
+                    if(data.braceletId != 0){
+                        isValid = true
+                        id = data.profileId
+                    } else{
+                        res.send('Bracelet is not valid.')
+                    }
+                })
+            }
 
             await knex('patient_data').where({
                 dataId: id
