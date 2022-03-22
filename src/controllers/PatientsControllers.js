@@ -16,6 +16,7 @@ module.exports = {
     async create(req, res, next){
         let isValid = false
         let id = 0
+        let patientName = ''
         let phones = []
         try {
             const {level, locationX, locationY, macAddress} = req.body
@@ -23,9 +24,9 @@ module.exports = {
 
             if(macAddress != ''){
                 await knex('bracelets').where({macAddress: macAddress}).then((data) => {
-                    if(data.braceletId != 0){
+                    if(data[0].braceletId != 0){
                         isValid = true
-                        id = data.profileId
+                        id = data[0].profileId
                     } else{
                         res.send('Bracelet is not valid.')
                     }
@@ -40,21 +41,26 @@ module.exports = {
                         locationY: locationY,
                         profileId: id
                     })
+                    
+                    await knex('profiles').where({profileId: id}).then((data) => {
+                        patientName = data[0].profileName
+                    })
 
                     await knex('nurses').then((data) => {
-                        res.send(data)
+                        console.log(data)
+                        for (let index = 0; index < data.length; index++) {
+                            client.messages.create({
+                                body: 'Alert: ' + patientName + ' has fallen.',
+                                from: process.env.TWILIO_PHONE_NUMBER ,
+                                to: data[index].phone
+                            }).then(message => console.log(message.sid));
+                            
+                        }
                     })
-
-                    client.messages.create({
-                        body: 'This is the ship that made the Kessel Run in fourteen parsecs?',
-                        from: process.env.TWILIO_PHONE_NUMBER ,
-                        to: '+351914906145'
-                    })
-                    .then(message => console.log(message.sid));
-
+                    
                     return res.status(200).send('Alert to nurses was sent!!')
                 }
-                return res.status(500).send('Information is not valid.')
+                
             } else {
                 return res.status(500).send('Information is not valid.')
             }
@@ -68,21 +74,8 @@ module.exports = {
 
     async delete(req, res, next){
         try {
-            //const {id} = req.params
-            let id = 0
-            const {macAddress} = req.body
-
-            if(macAddress != ''){
-                await knex('bracelets').where({macAddress: macAddress}).then((data) => {
-                    if(data.braceletId != 0){
-                        isValid = true
-                        id = data.profileId
-                    } else{
-                        res.send('Bracelet is not valid.')
-                    }
-                })
-            }
-
+            const {id} = req.params
+            
             await knex('patient_data').where({
                 dataId: id
             }).del()

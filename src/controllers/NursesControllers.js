@@ -10,10 +10,11 @@ module.exports = {
     },
     async create(req,res, next){
         try {
-            const {username} = req.body
+            const {username, phone} = req.body
             
             await knex('nurses').insert({
-                nurseName: username
+                nurseName: username,
+                phone: phone,
             })
 
             return res.status(201).send('Nurse ' + username + ' added.')
@@ -24,11 +25,12 @@ module.exports = {
 
     async update(req, res, next){
         try {
-            const {username} = req.body
+            const {username, phone} = req.body
             const {id} = req.params
 
             await knex('nurses').update({
-                nurseName: username
+                nurseName: username,
+                phone: phone
             }).where({
                 nurseId: id
             })

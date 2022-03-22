@@ -3,6 +3,7 @@ exports.up = function(knex) {
     return knex.schema.createTable('nurses',function(table){
         table.increments('nurseId').primary();
         table.string('nurseName').notNullable();
+        table.string('phone').notNullable();
     })
 };
 

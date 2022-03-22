@@ -22,7 +22,7 @@ routes.put('/nurses/:id', NursesController.update) //web routes
 routes.delete('/nurses/:id', NursesController.delete) //web routes
 
 routes.get('/patients/:id', PatientsController.get) //web routes
-routes.post('/patients', PatientsController.create) //esp32 routes
-routes.delete('/patients', PatientsController.delete) //web routes
+routes.post('/alert', PatientsController.create) //esp32 routes
+routes.delete('/patients-data/:id', PatientsController.delete) //web routes
 
 module.exports = routes;
