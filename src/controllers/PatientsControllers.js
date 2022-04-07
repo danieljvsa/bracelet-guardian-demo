@@ -89,8 +89,8 @@ module.exports = {
     async test(req,res, next){
         let message_received = req.body;
 
-        res.writeHead(200);
-		return res.end(`Welcome ESP32, the message you sent me is:` + message_received);
+        
+		return res.status(200).json(`Welcome ESP32, the message you sent me is:` + message_received);
     }
     
 }
