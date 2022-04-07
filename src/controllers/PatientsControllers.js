@@ -90,7 +90,7 @@ module.exports = {
         let message_received = req.body;
 
         
-		return res.status(200).json(`Welcome ESP32, the message you sent me is:` + message_received);
+		return res.status(200).end(`Welcome ESP32, the message you sent me is:` + message_received);
     }
     
 }
