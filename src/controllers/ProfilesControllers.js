@@ -3,7 +3,7 @@ const knex = require('../database')
 
 module.exports = {
     async index(req, res) {
-        await res.send('Welcome to Brace Guardin API demo. For more information go <a href="">here</a>.')
+        await res.status(200).send('Welcome to Brace Guardin API demo. For more information go <a href="">here</a>.')
     }, 
     async get(req, res){
         knex('profiles').then((data) => {
