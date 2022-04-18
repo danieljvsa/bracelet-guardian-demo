@@ -47,10 +47,13 @@ module.exports = {
                     })
 
                     await knex('nurses').then((data) => {
-                        console.log(data)
+                        //console.log(data)
+                        var today = new Date();
+                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + '.',
                                 from: process.env.TWILIO_PHONE_NUMBER ,
                                 to: data[index].phone
                             }).then(message => console.log(message.sid));
@@ -127,9 +130,12 @@ module.exports = {
 
                     await knex('nurses').then((data) => {
                         //console.log(data)
+                        var today = new Date();
+                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + '.',
                                 from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
                                 to: 'whatsapp:' + data[index].phone
                             }).then().done();
