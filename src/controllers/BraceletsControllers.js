@@ -4,8 +4,9 @@ const knex = require('../database')
 module.exports = {
      
     async get(req, res){
-        knex('bracelets').then((data) => {
-            res.send(data)
+        const {id} = req.params
+        knex('bracelets').where({profileId: id}).then((data) => {
+            res.status(200).send(data)
         })
     },
     async create(req, res, next){

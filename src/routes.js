@@ -22,8 +22,8 @@ routes.post('/add-profile', authMiddleware, ProfileController.create) //web rout
 routes.put('/profiles/:id', authMiddleware, ProfileController.update) //web routes
 routes.delete('/profiles/:id', authMiddleware, ProfileController.delete) //web routes
 
-routes.get('/get-bracelet', authMiddleware, BraceletController.get) //web routes
-routes.post('/add-bracelet', authMiddleware, BraceletController.create) //esp32 routes
+routes.get('/patient/:id/get-bracelets', authMiddleware, BraceletController.get) //web routes
+routes.post('/add-bracelet', authMiddleware, BraceletController.create) //web routes
 routes.delete('/bracelets/:id', authMiddleware, BraceletController.delete) //web routes
 
 routes.get('/get-nurses', authMiddleware, NursesController.get) //web routes

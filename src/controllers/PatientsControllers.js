@@ -129,10 +129,10 @@ module.exports = {
                     })
 
                     await knex('nurses').then((data) => {
-                        //console.log(data)
+                        console.log(data)
                         var today = new Date();
                         var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                        var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+                        var time = (today.getHours()) + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
                                 body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + '.',
