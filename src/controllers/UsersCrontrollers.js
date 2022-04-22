@@ -42,8 +42,8 @@ module.exports = {
                       await knex('users').insert(newUser).catch(err => res.status(400).json(err));
                       let user = await knex('users').where({
                         email: newUser.email
-                      }).select('password', 'name', 'email', 'id')
-                      console.log(user)
+                      }).select('name', 'email', 'id')
+                      //console.log(user)
                       res.status(200).send({email: user[0].email, name: user[0].name, token: generateToken({ id: user[0].id })})
                     })
                 })
