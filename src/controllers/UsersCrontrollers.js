@@ -36,14 +36,18 @@ module.exports = {
                 }
         
                 bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, (err, hash) => {
+                    bcrypt.hash(newUser.password, salt, async (err, hash) => {
                       if (err) throw err;
                       newUser.password = hash;
-                      knex('users').insert(newUser).select('password', 'name', 'email', 'id').then(user => {
-                        res.status(200).send({user: user.name, token: generateToken({ id: user.id })})
-                      }).catch(err => res.status(400).json(err));
+                      await knex('users').insert(newUser).catch(err => res.status(400).json(err));
+                      let user = await knex('users').where({
+                        email: newUser.email
+                      }).select('password', 'name', 'email', 'id')
+                      console.log(user)
+                      res.status(200).send({email: user[0].email, name: user[0].name, token: generateToken({ id: user[0].id })})
                     })
                 })
+                
             })
         }
     },
