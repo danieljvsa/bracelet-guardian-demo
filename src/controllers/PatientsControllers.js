@@ -155,6 +155,25 @@ module.exports = {
         } catch (error) {
             next(error)
         }
+    },
+    async false_alert(req,res,next) {
+        try {
+            const {macAddress} = req.params
+            let id = ''
+            await knex('bracelets').where({
+                macAddress: macAddress
+            }).select('profileId').then((data) => {
+                id = data[0].profileId
+            })
+            await knex('patient_data').where({
+                profileId: id
+            }).orderBy({column: 'created_at', order: 'desc'}).del()
+
+            return res.send('Alert deleted')
+
+        } catch (error) {
+            next(error)
+        }
     }
 
     
