@@ -90,10 +90,14 @@ module.exports = {
         }
     }, 
     async test(req,res, next){
-        let message_received = req.body;
+        let {message_received} = req.body;
 
-        
-		return res.status(200).end(`Welcome ESP32, the message you sent me is:` + message_received.message_received);
+        try {
+            return res.status(200).end(`Welcome ESP32, the message you sent me is:` + message_received);
+        } catch (error) {
+            return res.status(500).end('Error: ' + error);
+        }
+		
     }, 
     async test_create(req,res,next){
         let isValid = false
