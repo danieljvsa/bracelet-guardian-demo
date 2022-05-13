@@ -5,9 +5,9 @@ exports.seed = function(knex) {
     .then(function () {
       // Inserts seed entries
       return knex('profiles').insert([
-        {profileName: 'Zodwa Olukayode'},
-        {profileName: 'Gudina Nkosazana'},
-        {profileName: 'Cabdulqaadir Nekesa'}
+        {profileName: 'Zodwa Olukayode', battery: '-'},
+        {profileName: 'Gudina Nkosazana', battery: '50'},
+        {profileName: 'Cabdulqaadir Nekesa', battery: '-'}
       ]);
     });
 };

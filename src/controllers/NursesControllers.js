@@ -10,14 +10,25 @@ module.exports = {
     },
     async create(req,res, next){
         try {
-            const {username, phone} = req.body
-            
-            await knex('nurses').insert({
-                nurseName: username,
-                phone: phone,
-            })
+            const {username, phone, division} = req.body
 
-            return res.status(201).send('Nurse ' + username + ' added.')
+            if(division != 'front' && division != "end"){
+                return res.status(500).send('Division option not valid.')
+            }
+
+            if(username != '' && phone != '' && division != ''){
+                await knex('nurses').insert({
+                    nurseName: username,
+                    phone: phone,
+                    division: division
+                })
+    
+                return res.status(201).send('Nurse ' + username + ' added.')
+            } else {
+                return res.status(500).send('Data not valid.')
+            }
+            
+            
         } catch (error) {
             next(error)
         }
@@ -25,17 +36,26 @@ module.exports = {
 
     async update(req, res, next){
         try {
-            const {username, phone} = req.body
+            const {username, phone, division} = req.body
             const {id} = req.params
 
-            await knex('nurses').update({
-                nurseName: username,
-                phone: phone
-            }).where({
-                nurseId: id
-            })
+            if(division != 'front' && division != "end"){
+                return res.status(500).send('Division option not valid.')
+            }
 
-            return res.status(200).send('Nurse name updated')
+            if(username != '' && phone != '' && division != ''){
+                await knex('nurses').update({
+                    nurseName: username,
+                    phone: phone,
+                    division: division
+                }).where({
+                    nurseId: id
+                })
+
+                return res.status(200).send('Nurse name updated')
+            } else {
+                return res.status(500).send('Data not valid.')
+            }
         } catch (error) {
             next(error)
         }

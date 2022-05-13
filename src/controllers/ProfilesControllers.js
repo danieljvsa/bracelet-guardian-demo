@@ -9,6 +9,7 @@ module.exports = {
         let total_falls_count = []
         let today_falls_count = []
         let yesterday_falls_count = []
+        let battery_levels = []
         var today = new Date();
         var dateToday = today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+ today.getDate();
         var dateYesterday = today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+ (today.getDate()-1);
@@ -32,6 +33,7 @@ module.exports = {
                 }
                 today_falls_count.push(today_count)
                 yesterday_falls_count.push(yesterday_count)
+                battery_levels.push(data[index].battery)
                 //console.log(falls.length + ', ' + today_count + ', ' + yesterday_count)
                 today_count = 0
                 yesterday_count = 0
@@ -40,7 +42,7 @@ module.exports = {
             let response = []
             //console.log(falls)
             for (let index = 0; index < data.length; index++) {
-                response.push({id: data[index].profileId, name: data[index].profileName, totalFalls: total_falls_count[index], todayFalls: today_falls_count[index], yesterdayFalls: yesterday_falls_count[index]})
+                response.push({id: data[index].profileId, name: data[index].profileName, totalFalls: total_falls_count[index], todayFalls: today_falls_count[index], yesterdayFalls: yesterday_falls_count[index], battery_level: battery_levels[index]})
                 
             }
 
@@ -52,7 +54,8 @@ module.exports = {
             const {username} = req.body
             
             await knex('profiles').insert({
-                profileName: username
+                profileName: username,
+                battery: '-'
             })
 
             return res.status(201).send('Patient ' + username + ' added.')

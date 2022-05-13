@@ -4,6 +4,7 @@ exports.up = function(knex) {
         table.increments('nurseId').primary();
         table.string('nurseName').notNullable();
         table.string('phone').notNullable();
+        table.string('division').notNullable();
     })
 };
 

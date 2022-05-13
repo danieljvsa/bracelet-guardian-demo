@@ -19,7 +19,7 @@ module.exports = {
         let patientName = ''
         let phones = []
         try {
-            const {level, locationX, locationY, macAddress} = req.body
+            const {distance, battery, macAddress} = req.body
             //const {id} = req.params
 
             if(macAddress != ''){
@@ -34,16 +34,18 @@ module.exports = {
             }
 
             if(isValid != false){
-                if(locationX != '' && locationY != '' && id != '' && level != ''){
+                if(distance != '' && battery != '' && id != ''){
                     await knex('patient_data').insert({
-                        level: level,
-                        locationX: locationX,
-                        locationY: locationY,
+                        distance: distance,
                         profileId: id
                     })
                     
                     await knex('profiles').where({profileId: id}).then((data) => {
                         patientName = data[0].profileName
+                    })
+
+                    await knex('profiles').where({profileId: id}).update({
+                        battery: battery
                     })
 
                     await knex('nurses').then((data) => {
@@ -53,7 +55,7 @@ module.exports = {
                         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + '.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at room 25.',
                                 from: process.env.TWILIO_PHONE_NUMBER ,
                                 to: data[index].phone
                             }).then(message => console.log(message.sid));
@@ -105,7 +107,7 @@ module.exports = {
         let patientName = ''
         
         try {
-            const {level, locationX, locationY, macAddress} = req.body
+            const {distance, battery, macAddress} = req.body
             //const {id} = req.params
 
             if(macAddress != ''){
@@ -120,16 +122,18 @@ module.exports = {
             }
 
             if(isValid != false){
-                if(locationX != '' && locationY != '' && id != '' && level != ''){
+                if(distance != '' && battery != '' && id != ''){
                     await knex('patient_data').insert({
-                        level: level,
-                        locationX: locationX,
-                        locationY: locationY,
+                        distance: distance,
                         profileId: id
                     })
                     
                     await knex('profiles').where({profileId: id}).then((data) => {
                         patientName = data[0].profileName
+                    })
+
+                    await knex('profiles').where({profileId: id}).update({
+                        battery: battery
                     })
 
                     await knex('nurses').then((data) => {
@@ -139,7 +143,7 @@ module.exports = {
                         var time = (today.getHours()) + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + '.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at room 25.',
                                 from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
                                 to: 'whatsapp:' + data[index].phone
                             }).then().done();
@@ -171,7 +175,7 @@ module.exports = {
             })
             await knex('patient_data').where({
                 profileId: id
-            }).orderBy({column: 'created_at', order: 'desc'}).del()
+            }).orderBy({column: 'profile_id', order: 'desc'}).del()
 
             return res.send('Alert deleted')
 
