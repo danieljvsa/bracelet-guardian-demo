@@ -36,5 +36,7 @@ routes.post('/alert', PatientsController.create) //esp32 routes
 routes.post('/test-alert', PatientsController.test_create) //esp32 routes
 routes.post('/test', PatientsController.test) //esp32 test connection route
 routes.delete('/patients-data/:id', authMiddleware, PatientsController.delete) //web routes
+routes.post('/false-alert', PatientsController.false_alert) //esp32 test false alert route
+routes.post('/false-alert-test', PatientsController.false_alert_test) //esp32 test false alert route
 
 module.exports = routes;

@@ -166,17 +166,66 @@ module.exports = {
     },
     async false_alert(req,res,next) {
         try {
-            const {macAddress} = req.params
+            const {macAddress} = req.body
             let id = ''
+            let name = ''
             await knex('bracelets').where({
                 macAddress: macAddress
             }).select('profileId').then((data) => {
                 id = data[0].profileId
             })
-            await knex('patient_data').where({
-                profileId: id
-            }).orderBy({column: 'profile_id', order: 'desc'}).del()
 
+            await  knex('profiles').where({
+                profileId: id
+            }).select('profileName').then((data) => {
+                name = data[0].profileName
+            })
+
+            await knex.raw('DELETE FROM patient_data WHERE profileId = ' + id + ' AND dataId IN (SELECT dataId FROM patient_data ORDER BY dataId DESC LIMIT 1)')
+            
+            await knex('nurses').then((data) => {
+                for (let index = 0; index < data.length; index++) {
+                    client.messages.create({
+                        body: 'Alert: ' + name + ' has not fallen. False alert detected.',
+                        from: process.env.TWILIO_WHATSAPP ,
+                        to: data[index].phone
+                    }).then().done();
+                }
+            })
+            return res.send('Alert deleted')
+
+        } catch (error) {
+            next(error)
+        }
+    },
+    async false_alert_test(req,res,next) {
+        try {
+            const {macAddress} = req.body
+            let id = ''
+            let name = ''
+            await knex('bracelets').where({
+                macAddress: macAddress
+            }).select('profileId').then((data) => {
+                id = data[0].profileId
+            })
+
+            await  knex('profiles').where({
+                profileId: id
+            }).select('profileName').then((data) => {
+                name = data[0].profileName
+            })
+
+            await knex.raw('DELETE FROM patient_data WHERE profileId = ' + id + ' AND dataId IN (SELECT dataId FROM patient_data ORDER BY dataId DESC LIMIT 1)')
+            
+            await knex('nurses').then((data) => {
+                for (let index = 0; index < data.length; index++) {
+                    client.messages.create({
+                        body: 'Alert: ' + name + ' has not fallen. False alert detected.',
+                        from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
+                        to: 'whatsapp:' + data[index].phone
+                    }).then().done();
+                }
+            })
             return res.send('Alert deleted')
 
         } catch (error) {
