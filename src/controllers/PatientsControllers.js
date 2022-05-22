@@ -55,7 +55,7 @@ module.exports = {
                         var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at room 25.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' from antena.',
                                 from: process.env.TWILIO_PHONE_NUMBER ,
                                 to: data[index].phone
                             }).then(message => console.log(message.sid));
@@ -143,7 +143,7 @@ module.exports = {
                         var time = (today.getHours()) + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at room 25.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' from antena.',
                                 from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
                                 to: 'whatsapp:' + data[index].phone
                             }).then().done();

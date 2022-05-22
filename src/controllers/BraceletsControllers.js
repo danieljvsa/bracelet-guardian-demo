@@ -4,10 +4,33 @@ const knex = require('../database')
 module.exports = {
      
     async get(req, res){
-        const {id} = req.params
-        knex('bracelets').where({profileId: id}).then((data) => {
-            res.status(200).send(data)
+        let braces = []
+        let id = []
+        let names = []
+        let response = []
+
+        await knex('bracelets').then((data) => {
+            //console.log(data)
+            for (let index = 0; index < data.length; index++) {
+                braces.push(data[index].macAddress)
+                id.push(data[index].profileId)
+                
+            }
         })
+        
+        for (let index = 0; index < id.length; index++) {
+            //console.log(id[index])
+            await knex('profiles').where({profileId: id[index]}).then((data) => {
+                names.push(data[index].profileName)
+            })
+            
+        }
+
+        for (let index = 0; index < names.length; index++) {
+            response.push({name: names[index], macAddress: braces[index]})
+        }
+        
+        res.status(200).send(response)
     },
     async create(req, res, next){
         try {
