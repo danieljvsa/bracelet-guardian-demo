@@ -19,12 +19,17 @@ module.exports = {
                 
             }
         })
-        await knex('profiles').where({profileId: id[index]}).then((data) => {
-            for (let index = 0; index < id.length; index++) {
-                //console.log(id[index])
-                names.push(data[index].profileName)           
-            }
-        })
+        
+        for (let index = 0; index < id.length; index++) {
+            //console.log(id[index])
+            await knex('profiles').where({profileId: id[index]}).then((data) => {
+                if( data[0].profileName != undefined){
+                    names.push(data[0].profileName)
+                }
+            })
+            
+        }
+
         for (let index = 0; index < names.length; index++) {
             response.push({id: brace_id[index], name: names[index], macAddress: braces[index]})
         }
