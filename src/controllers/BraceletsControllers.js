@@ -31,7 +31,7 @@ module.exports = {
         for (let index = 0; index < names.length; index++) {
             response.push({id: brace_id[index], name: names[index], macAddress: braces[index]})
         }
-        
+        console.log(response)
         res.status(200).send(response)
     },
     async create(req, res, next){
@@ -69,22 +69,26 @@ module.exports = {
             const {id} = req.params
             let profileId = 0
             if(username != "" && macAddress != "" && id != ""){
-                await knex('profiles').where({
-                    profileName: username,
-                }).then((data) => {
-                    console.log(id)
-                    profileId = data[0].profileId
-                    console.log(data)
-                })
                 
-                await knex('bracelets').update({
-                    macAddress: macAddress,
-                    profileId: profileId
-                }).where({
-                    braceletId: id
+                let profile = await knex('profiles').where({
+                    profileName: username
                 })
+                profileId = profile[0].profileId
+                //console.log(profile[0].profileId)
+                if(profileId != 0){
+                    await knex('bracelets').update({
+                        macAddress: macAddress,
+                        profileId: profileId
+                    }).where({
+                        braceletId: id
+                    })
+                    return res.status(200).send('Bracelet updated')
+                }else{
+                    return res.status(502).send('Profile Id not identified.')
+                }
                 
-                return res.status(200).send('Bracelet updated')
+                
+                
                 
             } else {
                 return res.status(501).send('Data invalid')
