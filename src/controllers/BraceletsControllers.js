@@ -8,12 +8,14 @@ module.exports = {
         let id = []
         let names = []
         let response = []
+        let brace_id = []
 
         await knex('bracelets').then((data) => {
             //console.log(data)
             for (let index = 0; index < data.length; index++) {
                 braces.push(data[index].macAddress)
                 id.push(data[index].profileId)
+                brace_id.push(data[index].braceletId)
                 
             }
         })
@@ -27,7 +29,7 @@ module.exports = {
         }
 
         for (let index = 0; index < names.length; index++) {
-            response.push({name: names[index], macAddress: braces[index]})
+            response.push({id: brace_id[index], name: names[index], macAddress: braces[index]})
         }
         
         res.status(200).send(response)
@@ -58,6 +60,41 @@ module.exports = {
             
         } catch (error) {
             next(error)
+        }
+    },
+
+    async update(req, res, next){
+        try {
+            const {username, macAddress} = req.body
+            const {id} = req.params
+            let profileId = 0
+            if(username != "" && macAddress != "" && id != ""){
+                await knex('profiles').where({
+                    profileName: username,
+                }).then((data) => {
+                    console.log(id)
+                    profileId = data[0].profileId
+                    console.log(data)
+                })
+                
+                await knex('bracelets').update({
+                    macAddress: macAddress,
+                    profileId: profileId
+                }).where({
+                    braceletId: id
+                })
+                
+                return res.status(200).send('Bracelet updated')
+                
+            } else {
+                return res.status(501).send('Data invalid')
+            }
+            
+
+            
+        } catch (error) {
+            console.log(error)
+            return res.status(500).send(error)
         }
     },
 

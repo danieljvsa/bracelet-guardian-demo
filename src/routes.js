@@ -24,6 +24,7 @@ routes.delete('/profiles/:id', authMiddleware, ProfileController.delete) //web r
 
 routes.get('/bracelets', authMiddleware, BraceletController.get) //web routes
 routes.post('/add-bracelet', authMiddleware, BraceletController.create) //web routes
+routes.put('/bracelets/:id', authMiddleware, BraceletController.update) //web routes
 routes.delete('/bracelets/:id', authMiddleware, BraceletController.delete) //web routes
 
 routes.get('/get-nurses', authMiddleware, NursesController.get) //web routes
