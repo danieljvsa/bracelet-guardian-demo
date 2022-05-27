@@ -19,15 +19,12 @@ module.exports = {
                 
             }
         })
-        
-        for (let index = 0; index < id.length; index++) {
-            //console.log(id[index])
-            await knex('profiles').where({profileId: id[index]}).then((data) => {
-                names.push(data[index].profileName)
-            })
-            
-        }
-
+        await knex('profiles').where({profileId: id[index]}).then((data) => {
+            for (let index = 0; index < id.length; index++) {
+                //console.log(id[index])
+                names.push(data[index].profileName)           
+            }
+        })
         for (let index = 0; index < names.length; index++) {
             response.push({id: brace_id[index], name: names[index], macAddress: braces[index]})
         }
@@ -38,14 +35,15 @@ module.exports = {
         try {
             const {macAddress, username} = req.body
             let id = 0
-            await knex('profiles').where({
-                profileName: username,
-            }).then((data) => {
-                console.log(id)
-                id = data[0].profileId
-                console.log(data)
-            })
-
+            if(username != ""){
+                await knex('profiles').where({
+                    profileName: username,
+                }).then((data) => {
+                    console.log(data)
+                    id = data[0].profileId
+                    console.log(data)
+                })
+            }
             if(id != 0 && id != null){
                 await knex('bracelets').insert({
                     macAddress: macAddress,
