@@ -187,7 +187,7 @@ module.exports = {
                 name = data[0].profileName
             })
 
-            await knex.raw('DELETE FROM patient_data WHERE profileId = ' + id + ' AND dataId IN (SELECT dataId FROM patient_data ORDER BY dataId DESC LIMIT 1)')
+            await knex.raw('DELETE FROM patient_data WHERE profileId = ' + id + ' ORDER BY dataId DESC LIMIT 1')
             
             await knex('nurses').then((data) => {
                 for (let index = 0; index < data.length; index++) {

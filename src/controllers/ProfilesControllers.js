@@ -13,6 +13,8 @@ module.exports = {
         var today = new Date();
         var dateToday = today.getDate() +'/0'+(today.getMonth()+1)+'/'+ today.getFullYear();
         var dateYesterday = (today.getDate()-1) +'/0'+(today.getMonth()+1)+'/'+ today.getFullYear();
+        var dateTodayHK = (today.getMonth()+1) +'/'+ today.getDate()+'/'+ today.getFullYear();
+        var dateYesterdayHK = (today.getMonth()+1) +'/'+ (today.getDate()-1)+'/'+ today.getFullYear();
         knex('profiles').then(async (data) => {
             //console.log(data[0])
             for (let index = 0; index < data.length; index++) {
@@ -23,10 +25,10 @@ module.exports = {
                 let yesterday_count = 0
                 for (let i = 0; i < falls.length; i++) {
                     console.log(falls[i].created_at.toLocaleString() + ', ' + dateToday )
-                    if(falls[i].created_at.toLocaleString().includes(dateToday)){
+                    if(falls[i].created_at.toLocaleString().includes(dateToday) || falls[i].created_at.toLocaleString().includes(dateTodayHK)){
                         today_count++
                         //console.log('+1 today')
-                    } else if (falls[i].created_at.toLocaleString().includes(dateYesterday)){
+                    } else if (falls[i].created_at.toLocaleString().includes(dateYesterday) || falls[i].created_at.toLocaleString().includes(dateYesterdayHK)){
                         yesterday_count++
                         //console.log('+1 yesterday')
                     }
