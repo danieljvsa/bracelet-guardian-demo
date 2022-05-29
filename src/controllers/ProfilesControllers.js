@@ -11,21 +11,22 @@ module.exports = {
         let yesterday_falls_count = []
         let battery_levels = []
         var today = new Date();
-        var dateToday = today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+ today.getDate();
-        var dateYesterday = today.getFullYear()+'-0'+(today.getMonth()+1)+'-'+ (today.getDate()-1);
+        var dateToday = today.getDate() +'/0'+(today.getMonth()+1)+'/'+ today.getFullYear();
+        var dateYesterday = (today.getDate()-1) +'/0'+(today.getMonth()+1)+'/'+ today.getFullYear();
         knex('profiles').then(async (data) => {
             //console.log(data[0])
             for (let index = 0; index < data.length; index++) {
                 let falls = await knex('patient_data').where({profileId: data[index].profileId}).select('created_at')
+                //console.log(falls)
                 total_falls_count.push(falls.length)
                 let today_count = 0
                 let yesterday_count = 0
                 for (let i = 0; i < falls.length; i++) {
-                    //console.log(falls[i].created_at.toString() + ', ' + dateToday )
-                    if(falls[i].created_at.toString().includes(dateToday)){
+                    console.log(falls[i].created_at.toLocaleString() + ', ' + dateToday )
+                    if(falls[i].created_at.toLocaleString().includes(dateToday)){
                         today_count++
                         //console.log('+1 today')
-                    } else if (falls[i].created_at.toString().includes(dateYesterday)){
+                    } else if (falls[i].created_at.toLocaleString().includes(dateYesterday)){
                         yesterday_count++
                         //console.log('+1 yesterday')
                     }
