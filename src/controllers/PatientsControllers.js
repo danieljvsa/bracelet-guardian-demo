@@ -105,9 +105,9 @@ module.exports = {
         let isValid = false
         let id = 0
         let patientName = ''
-        
+        let distance = "1.00"
         try {
-            const {distance, battery, macAddress} = req.body
+            const {battery, macAddress} = req.body
             //const {id} = req.params
 
             if(macAddress != ''){
