@@ -9,7 +9,7 @@ module.exports = {
      
     async get(req, res){
         const {id} = req.params
-        await knex('patient_data').where({profileId: id}).orderBy('profileId', 'desc').then((data) => {
+        await knex('patient_data').where({profileId: id}).orderBy('dataId', 'desc').then((data) => {
             res.status(200).send(data)
         })
     },
