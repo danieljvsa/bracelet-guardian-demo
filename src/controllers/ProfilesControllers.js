@@ -56,12 +56,23 @@ module.exports = {
         try {
             const {username} = req.body
             
-            await knex('profiles').insert({
-                profileName: username,
-                battery: '-'
-            })
-
-            return res.status(201).send('Patient ' + username + ' added.')
+            if(username == ''){
+                return res.status(400).send('Username input not inserted.')
+            }else{
+                const patients = await knex('profiles').where({profileName: username})
+                if(patients.length >= 1){
+                    return res.status(400).send('Patient name alredy created.')
+                }else{
+                    await knex('profiles').insert({
+                        profileName: username,
+                        battery: '-'
+                    })
+        
+                    return res.status(201).send('Patient ' + username + ' added.')
+                }
+                
+            }
+            
         } catch (error) {
             next(error)
         }
@@ -72,13 +83,22 @@ module.exports = {
             const {username} = req.body
             const {id} = req.params
 
-            await knex('profiles').update({
-                profileName: username
-            }).where({
-                profileId: id
-            })
+            if(username == '' || id == ''){
+                return res.status(400).send('Username input not inserted.')
+            }else{
+                const patients = await knex('profiles').where({profileName: username})
+                if(patients.length >= 1){
+                    return res.status(400).send('Patient name alredy created.')
+                } else {
+                    await knex('profiles').update({
+                        profileName: username
+                    }).where({
+                        profileId: id
+                    })
 
-            return res.status(200).send('Patient name updated')
+                    return res.status(200).send('Patient name updated')
+                }
+            }
         } catch (error) {
             next(error)
         }
@@ -88,11 +108,16 @@ module.exports = {
         try {
             const {id} = req.params
 
-            await knex('profiles').where({
-                profileId: id
-            }).del()
-
-            return res.send('Patient deleted')
+            if(id == ''){
+                return res.status(400).send('Id is not valid.') 
+            }else{
+                await knex('profiles').where({
+                    profileId: id
+                }).del()
+    
+                return res.send('Patient deleted')
+            }
+            
 
         } catch (error) {
             next(error)

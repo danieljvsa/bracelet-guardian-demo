@@ -24,31 +24,37 @@ module.exports = {
         const { name, email, password} = req.body;
 
   
-        if (!name || !email || !password) {
+        if (name == '' || email == '' || password == '') {
             res.status(400).json('Name, email or password were not deliveried.')
         }
         else {
+          const usernames = await knex('users').where({ name: name })
+          const emails = await knex('users').where({ email: email })
+          if(usernames.length >= 1 || emails.length >= 1){
+            return res.status(400).send('Email or username already in use.')
+          } else {
             knex('users').where({ email: email }).then(user => {
-                const newUser = {
-                  name,
-                  email,
-                  password
-                }
-        
-                bcrypt.genSalt(10, (err, salt) => {
-                    bcrypt.hash(newUser.password, salt, async (err, hash) => {
-                      if (err) throw err;
-                      newUser.password = hash;
-                      await knex('users').insert(newUser).catch(err => res.status(400).json(err));
-                      let user = await knex('users').where({
-                        email: newUser.email
-                      }).select('name', 'email', 'id')
-                      //console.log(user)
-                      res.status(200).send({email: user[0].email, name: user[0].name, token: generateToken({ id: user[0].id })})
-                    })
-                })
-                
+              const newUser = {
+                name,
+                email,
+                password
+              }
+              
+              bcrypt.genSalt(10, (err, salt) => {
+                  bcrypt.hash(newUser.password, salt, async (err, hash) => {
+                    if (err) throw err;
+                    newUser.password = hash;
+                    await knex('users').insert(newUser).catch(err => res.status(400).json(err));
+                    let user = await knex('users').where({
+                      email: newUser.email
+                    }).select('name', 'email', 'id')
+                    //console.log(user)
+                    res.status(201).send({email: user[0].email, name: user[0].name, token: generateToken({ id: user[0].id })})
+                  })
+              })
+              
             })
+          }
         }
     },
     async authenticate (req,res) {
@@ -57,10 +63,10 @@ module.exports = {
         const user = await knex('users').where({
             email: email
           }).select('password', 'name', 'email', 'id')
-        if (!user) {
+        if (user.length === 0) {
           return res.status(400).json('That email is not registered')
         }
-        //console.log(user[0].password)
+        console.log(user)
         // Match password
         if(!await bcrypt.compare(password, user[0].password)){
           return res.json({ message: 'Password incorrect' })

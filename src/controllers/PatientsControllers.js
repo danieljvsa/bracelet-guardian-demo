@@ -21,8 +21,8 @@ module.exports = {
         try {
             const {distance, battery, macAddress} = req.body
             //const {id} = req.params
-
-            if(macAddress != ''){
+            let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+            if(macAddress != '' || MACRegex.test(macAddress) === true){
                 await knex('bracelets').where({macAddress: macAddress}).then((data) => {
                     if(data[0].braceletId != 0){
                         isValid = true
@@ -31,6 +31,8 @@ module.exports = {
                         res.send('Bracelet is not valid.')
                     }
                 })
+            }else{
+                return res.status(400).send('Mac address is not valid.')
             }
 
             if(isValid != false){
@@ -67,7 +69,7 @@ module.exports = {
                 }
                 
             } else {
-                return res.status(500).send('Information is not valid.')
+                return res.status(400).send('Information is not valid.')
             }
             
 
@@ -80,12 +82,16 @@ module.exports = {
     async delete(req, res, next){
         try {
             const {id} = req.params
+            if(id != ''){
+                await knex('patient_data').where({
+                    dataId: id
+                }).del()
+    
+                return res.status(200).send('Alert deleted')
+            } else{
+                return res.status(400).send('Alert was not deleted')
+            }
             
-            await knex('patient_data').where({
-                dataId: id
-            }).del()
-
-            return res.send('Alert deleted')
 
         } catch (error) {
             next(error)
@@ -97,7 +103,7 @@ module.exports = {
         try {
             return res.status(200).end(`Welcome ESP32, the message you sent me is:` + message_received);
         } catch (error) {
-            return res.status(500).end('Error: ' + error);
+            return res.status(400).end('Error: ' + error);
         }
 		
     }, 
@@ -109,8 +115,8 @@ module.exports = {
         try {
             const {battery, macAddress} = req.body
             //const {id} = req.params
-
-            if(macAddress != ''){
+            let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+            if(macAddress != '' || MACRegex.test(macAddress) === true){
                 await knex('bracelets').where({macAddress: macAddress}).then((data) => {
                     console.log(data)
                     if(data[0] != undefined){
@@ -118,13 +124,12 @@ module.exports = {
                             isValid = true
                             id = data[0].profileId
                         } else{
-                            res.send('Bracelet is not valid.')
+                            res.status(400).send('Bracelet is not valid.')
                         }
-                    } else {
-                        
-                    }
-                    
+                    }                     
                 })
+            } else {
+                return res.status(400).send("Patient name was not valid.")
             }
 
             if(isValid != false){

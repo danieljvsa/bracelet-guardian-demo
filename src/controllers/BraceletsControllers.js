@@ -46,18 +46,31 @@ module.exports = {
                 }).then((data) => {
                     console.log(data)
                     id = data[0].profileId
-                    console.log(data)
+                    ///console.log(data)
                 })
+            } else{
+                return res.status(400).send("Patient name was not valid.")
             }
             if(id != 0 && id != null){
-                await knex('bracelets').insert({
+                let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+                //MACRegex.test(macAddress);
+                const macs = await knex('bracelets').where({
                     macAddress: macAddress,
-                    profileId: id
                 })
-
-                return res.status(201).send('Bracelet is ' + macAddress + '  connected.')
+                //console.log(MACRegex.test(macAddress))
+                if(macs.length >= 1 || MACRegex.test(macAddress) != true){
+                    return res.status(400).send("Mac Address is already in use or is not valid.")
+                }else{
+                    await knex('bracelets').insert({
+                        macAddress: macAddress,
+                        profileId: id
+                    })
+    
+                    return res.status(201).send('Bracelet is ' + macAddress + '  connected.')
+                }
+                
             } else {
-                return res.status(500).send('Bracelet  ' + macAddress + ' was not connected.')
+                return res.status(400).send('Bracelet  ' + macAddress + ' was not connected.')
             }
 
             
@@ -79,15 +92,23 @@ module.exports = {
                 profileId = profile[0].profileId
                 //console.log(profile[0].profileId)
                 if(profileId != 0){
-                    await knex('bracelets').update({
+                    let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+                    const macs = await knex('bracelets').where({
                         macAddress: macAddress,
-                        profileId: profileId
-                    }).where({
-                        braceletId: id
                     })
-                    return res.status(200).send('Bracelet updated')
+                    if(macs.length >= 1 || MACRegex.test(macAddress) != true){
+                        return res.status(201).send("Mac Address is already in use or is not valid.")
+                    }else{
+                        await knex('bracelets').update({
+                            macAddress: macAddress,
+                            profileId: profileId
+                        }).where({
+                            braceletId: id
+                        })
+                        return res.status(200).send('Bracelet updated')
+                    }
                 }else{
-                    return res.status(502).send('Profile Id not identified.')
+                    return res.status(400).send('Profile Id not identified.')
                 }
                 
                 
@@ -109,12 +130,15 @@ module.exports = {
         try {
             const {id} = req.params
 
-            await knex('bracelets').where({
-                braceletId: id
-            }).del()
+            if(id != ""){
+                await knex('bracelets').where({
+                    braceletId: id
+                }).del()
 
-            return res.send('Bracelet deleted')
-
+                return res.status(200).send('Bracelet deleted.')
+            } else {
+                return res.status(400).send('Id was not valid.')
+            }
         } catch (error) {
             next(error)
         }

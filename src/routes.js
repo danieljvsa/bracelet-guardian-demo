@@ -11,7 +11,7 @@ const authMiddleware = require('./middlewares/auth')
 
 
 routes.get('/users', authMiddleware, UsersController.index)
-routes.post('/create', UsersController.create)
+routes.post('/create', authMiddleware, UsersController.create)
 routes.post('/authenticate', UsersController.authenticate)
 routes.post('/forgot-password', UsersController.forgot_password)
 routes.post('/reset-password', UsersController.reset_password)
