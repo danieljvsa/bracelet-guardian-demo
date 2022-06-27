@@ -19,57 +19,68 @@ module.exports = {
         let patientName = ''
         let phones = []
         try {
-            const {distance, battery, macAddress} = req.body
+            const {battery, macAddress, distance, address} = req.body
             //const {id} = req.params
             let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
             if(macAddress != '' || MACRegex.test(macAddress) === true){
                 await knex('bracelets').where({macAddress: macAddress}).then((data) => {
-                    if(data[0].braceletId != 0){
-                        isValid = true
-                        id = data[0].profileId
-                    } else{
-                        res.send('Bracelet is not valid.')
-                    }
+                    console.log(data)
+                    if(data[0] != undefined){
+                        if(data[0].braceletId != 0){
+                            isValid = true
+                            id = data[0].profileId
+                        } else{
+                            res.status(400).send('Bracelet is not valid.')
+                        }
+                    }                     
                 })
-            }else{
-                return res.status(400).send('Mac address is not valid.')
+            } else {
+                return res.status(400).send("Patient name was not valid.")
             }
 
             if(isValid != false){
-                if(distance != '' && battery != '' && id != ''){
-                    await knex('patient_data').insert({
-                        distance: distance,
-                        profileId: id
-                    })
+                if(distance != '' && battery != '' && id != '' && address != ''){
+                    
+                    var today = new Date();
+                    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                    var time = (today.getHours()+1) + ":" + today.getMinutes() + ":" + today.getSeconds();
                     
                     await knex('profiles').where({profileId: id}).then((data) => {
                         patientName = data[0].profileName
                     })
 
+                    await knex('nurses').then((data) => {
+                        console.log(data)
+                        for (let index = 0; index < data.length; index++) {
+                            client.messages.create({
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena. Its room ' + address + '.',
+                                from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
+                                to: 'whatsapp:' + data[index].phone
+                            }).then().done();
+                            
+                        }
+                    })
+
+                    await knex('patient_data').insert({
+                        distance: distance,
+                        address: address,
+                        created_at: today,
+                        profileId: id
+                    })
+                    
+                   
+
                     await knex('profiles').where({profileId: id}).update({
                         battery: battery
                     })
 
-                    await knex('nurses').then((data) => {
-                        //console.log(data)
-                        var today = new Date();
-                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                        var time = (today.getHours()+2) + ":" + today.getMinutes() + ":" + today.getSeconds();
-                        for (let index = 0; index < data.length; index++) {
-                            client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena.',
-                                from: process.env.TWILIO_PHONE_NUMBER ,
-                                to: data[index].phone
-                            }).then(message => console.log(message.sid));
-                            
-                        }
-                    })
+                    
                     
                     return res.status(200).send('Alert to nurses was sent!!')
                 }
                 
             } else {
-                return res.status(400).send('Information is not valid.')
+                return res.status(500).send('Information is not valid.')
             }
             
 
@@ -111,9 +122,9 @@ module.exports = {
         let isValid = false
         let id = 0
         let patientName = ''
-        let distance = "1.00"
+        //let distance = "1.00"
         try {
-            const {battery, macAddress} = req.body
+            const {battery, macAddress, distance, address} = req.body
             //const {id} = req.params
             let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
             if(macAddress != '' || MACRegex.test(macAddress) === true){
@@ -133,34 +144,42 @@ module.exports = {
             }
 
             if(isValid != false){
-                if(distance != '' && battery != '' && id != ''){
-                    await knex('patient_data').insert({
-                        distance: distance,
-                        profileId: id
-                    })
+                if(distance != '' && battery != '' && id != '' && address != ''){
+                    
+                    var today = new Date();
+                    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+                    var time = (today.getHours()+1) + ":" + today.getMinutes() + ":" + today.getSeconds();
                     
                     await knex('profiles').where({profileId: id}).then((data) => {
                         patientName = data[0].profileName
                     })
 
-                    await knex('profiles').where({profileId: id}).update({
-                        battery: battery
-                    })
-
                     await knex('nurses').then((data) => {
                         console.log(data)
-                        var today = new Date();
-                        var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-                        var time = (today.getHours()+2) + ":" + today.getMinutes() + ":" + today.getSeconds();
                         for (let index = 0; index < data.length; index++) {
                             client.messages.create({
-                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena.',
+                                body: 'Alert: ' + patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena. Its room ' + address + '.',
                                 from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
                                 to: 'whatsapp:' + data[index].phone
                             }).then().done();
                             
                         }
                     })
+
+                    await knex('patient_data').insert({
+                        distance: distance,
+                        address: address,
+                        created_at: today,
+                        profileId: id
+                    })
+                    
+                   
+
+                    await knex('profiles').where({profileId: id}).update({
+                        battery: battery
+                    })
+
+                    
                     
                     return res.status(200).send('Alert to nurses was sent!!')
                 }

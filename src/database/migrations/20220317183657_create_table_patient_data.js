@@ -3,7 +3,8 @@ exports.up = async function(knex) {
   await knex.schema.createTable('patient_data',function(table){
       table.increments('dataId').primary();
       table.string('distance').notNullable();
-      table.timestamp('created_at').defaultTo(knex.fn.now());
+      table.string('address').notNullable();
+      table.timestamp('created_at').notNullable();
       table.integer('profileId').unsigned().index().references('profileId').inTable('profiles');
   })
 };
