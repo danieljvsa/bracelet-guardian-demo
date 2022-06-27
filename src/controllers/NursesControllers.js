@@ -63,7 +63,7 @@ module.exports = {
                         nurseId: id
                     })
     
-                    return res.status(200).send('Nurse name updated')
+                    return res.status(200).send('Nurse updated')
                 }
                 
             } else {

@@ -115,7 +115,7 @@ module.exports = {
                 
                 
             } else {
-                return res.status(501).send('Data invalid')
+                return res.status(400).send('Data was not inserted.')
             }
             
 
