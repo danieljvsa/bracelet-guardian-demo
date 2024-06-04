@@ -1,0 +1,46 @@
+services: 
+  backend:
+    restart: always
+    build: .
+    volumes:
+      - ./:/server/api
+      - /server/api/node_modules
+    depends_on:
+      - postgres
+    ports: 
+      - 8081:80
+    enviroment:
+      - TWILIO_FAILSAFE = 
+      - TWILIO_ACCOUNT_SID = 
+      - TWILIO_AUTH_TOKEN = 
+      - TWILIO_PHONE_NUMBER = 
+      - TWILIO_WHATSAPP = 
+      - JWT_KEY = 
+      - NODE_SERVICE = 
+      - NODE_PASS = 
+      - NODE_USER = 
+      - DB_HOST=
+      - DB_USER=
+      - DB_PASSWORD=
+      - DB_DATABASE=
+      - DB_PORT=
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+    ports:
+      - 5432:5432
+    restart: always
+
+  pgadmin:
+    container_name: pgadmin
+    image: dpage/pgadmin4:latest
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - 5050:80
+    restart: always
