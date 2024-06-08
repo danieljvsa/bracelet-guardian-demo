@@ -7,8 +7,11 @@ exports.up = async function(knex) {
       table.string('password').notNullable();
       table.string('passwordResetToken');
       table.string('passwordResetExpires');
+      table.boolean('isAdmin').notNullable();
+      table.boolean('active').notNullable();
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
+      table.integer('orgId').unsigned().index().references('orgId').inTable('organizations');
   })
 };
 

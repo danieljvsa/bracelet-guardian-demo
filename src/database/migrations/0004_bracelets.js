@@ -4,7 +4,8 @@ exports.up = async function(knex) {
         table.increments('braceletId').primary();
         table.string('macAddress').notNullable();
         table.timestamp('created_at').defaultTo(knex.fn.now());
-        table.integer('profileId').unsigned().index().references('profileId').inTable('profiles');
+        table.timestamp('updated_at').defaultTo(knex.fn.now());
+        table.integer('patientId').unsigned().index().references('patientId').inTable('patients');
     })
 };
 
