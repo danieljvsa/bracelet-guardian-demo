@@ -5,7 +5,7 @@ exports.seed = function(knex) {
     .then(function () {
       // Inserts seed entries
       return knex('nurses').insert([
-        {nurseName: 'Fabian Wood', phone: '+351914906145', 'division': 'front'},     
+        {nurseName: 'Fabian Wood', phone: '+351914906145', 'division': 'front', orgId: 1},     
       ]);
     });
 };
