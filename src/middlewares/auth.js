@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken')
 const knex = require('../database')
 
 
-module.exports = (req, res, next) => {
+module.exports.validateUser = async (req, res, next) => {
     const authHeader = req.headers.authorization
 
     if(!authHeader){
@@ -33,7 +33,7 @@ module.exports = (req, res, next) => {
           return res.send({success: false, error: 'That user is not registered'})
         }
 
-        req.user = user
+        req.user = user[0]
         return next()
     })
 

@@ -1,4 +1,6 @@
+const knex = require('../database');
 const logic = require('../logic')
+const mailer = require('../modules/mailer')
 
 module.exports.get = async (req, res) => {
     return res.send({success: true, data: req.invite})
@@ -29,19 +31,25 @@ module.exports.update = async (req, res) => {
     const { name, email, organization } = req.body;
 
     try {
-        const org = await knex('organizations').where({id: req.user.orgId})
+        const org = await knex('organizations').where({orgId: req.user.orgId})
         if(!org.length) return res.send({success: false, error: "Organization not found."})
 
-        const orgId = (org[0].code !== "admin") ? req.invite.orgId : organization;
+        const orgId = (org[0].code !== "admin") ? req.invite.orgId : (typeof organization === "string") ? organization : req.invite.orgId;
 
-        const update = knex('invites') 
-        .where({id: req.invite.id}) 
+        const update = await knex('invites') 
         .update({ 
-            name: name ? name : knex.raw('invites.name'), 
-            email: email ? email : knex.raw('invites.email'), 
-            orgId: orgId ? orgId : knex.raw('invites.orgId')
-        });
-        if(!update.length) return res.send({success: false, error: "Invite not found."}) 
+            name: name ? name : req.invite.name, 
+            email: email ? email : req.invite.email, 
+            orgId: orgId ? orgId : req.invite.orgId,
+            isAdmin: (org[0].code === "admin") ? true : false
+        })
+        .where({id: req.invite.id}) 
+        .catch((error) => {
+            console.log(error)
+            return res.send({success: false, error})
+        })
+        return res.send({success: true, data: req.invite.id})
+        //if(!update.length) return res.send({success: false, error: "Invite not found."}) 
     } catch (error) {
         console.log("controllers/invite/update: ", error)
         return res.send({success: false, error: error})
@@ -56,19 +64,24 @@ module.exports.create = async (req, res) => {
     try {
         let orgId = req.user.orgId;
 
-        const org = await knex('organizations').where({id: req.user.orgId})
+        const org = await knex('organizations').where({orgId: req.user.orgId})
         if(!org.length) return res.send({success: false, error: "Organization not found."})
 
-        if(typeof organization !== "string") orgId = (org[0].code !== "admin") ? req.invite.orgId : organization;
+        if(typeof organization === "string") orgId = (org[0].code !== "admin") ? req.invite.orgId : organization;
 
-        const [id] = await knex('invites').insert({
+        let inviteId = 0;
+        await knex('invites').insert({
             name: name,
             email: email,
             orgId: orgId,
             active: true,
-            isAdmin: (org[0].code !== "admin") ? true : false,
+            isAdmin: (org[0].code === "admin") ? true : false,
             createdBy: req.user.id
-        });
+        })
+
+        const invite = await knex('invites').where({name: name, email: email, active: true})
+        if(!invite.length) return res.send({success: false, error: "Invite not created."})
+        inviteId = invite[0].id
 
         const token = await logic.master.generateRandomNumber();
         if(!token.success) return res.send(token)
@@ -76,17 +89,20 @@ module.exports.create = async (req, res) => {
         const now = new Date()
         now.setHours(now.getHours() + 1)
 
+        const hashedToken = await logic.master.hashNumber(token.data)
+        if(!hashedToken.success) return res.send(hashedToken)
+
         await knex('invites').update({
-            codeResetToken: token.data,
+            codeResetToken: hashedToken.data,
             codeResetExpires: now
-        }).where({id: id})
+        }).where({id: inviteId})
 
         mailer.sendMail({
             to: email,
             from: process.env.NODE_USER,
             template: 'auth/invite',
             subject: 'Invite to platform',
-            context: {token}
+            context: {token: token.data}
         }, (err) => {
             if (err) {
                 console.log("controllers/invites/create/sendMail: ", err)
@@ -94,7 +110,7 @@ module.exports.create = async (req, res) => {
             }
         })
 
-        if(id) return res.send({success: true, data: id})
+        if(inviteId) return res.send({success: true, data: inviteId})
         else return res.send({error: "User not created."})
     } catch (error) {
         console.log("controllers/invite/create: ", error)
@@ -107,21 +123,24 @@ module.exports.resend = async (req, res) => {
     try {
         const token = await logic.master.generateRandomNumber();
         if(!token.success) return res.send(token)
+        console.log(token)
         
         const now = new Date()
         now.setHours(now.getHours() + 1)
 
+        const hashedToken = await logic.master.hashNumber(token.data)
+        if(!hashedToken.success) return res.send(hashedToken)
+
         await knex('invites').update({
-            codeResetToken: token.data,
+            codeResetToken: hashedToken.data,
             codeResetExpires: now
         }).where({id: req.invite.id})
-
         mailer.sendMail({
-            to: email,
+            to: req.invite.email,
             from: process.env.NODE_USER,
             template: 'auth/invite',
             subject: 'Invite to platform',
-            context: {token}
+            context: {token: token.data}
         }, (err) => {
             if (err) {
                 console.log("controllers/invites/resend/sendMail: ", err)

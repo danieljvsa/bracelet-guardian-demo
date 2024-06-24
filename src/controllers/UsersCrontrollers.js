@@ -99,7 +99,7 @@ module.exports = {
 
         mailer.sendMail({
           to: email,
-          from: "danielviana18@gmail.com",
+          from: process.env.NODE_USER,
           template: 'auth/forgot_password',
           subject: 'Password reset',
           context: {token}
