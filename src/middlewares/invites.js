@@ -14,6 +14,21 @@ module.exports.checkEmailAndActive = async (req, res, next) => {
     }
 }
 
+module.exports.checkByEmailAndActive = async (req, res, next) => {
+    if(typeof req.body.email !== "string") return res.send({success: false, error: "email is missing!"})
+    
+    try {
+        const invite = await knex('invites').where({email: req.body.email, active: true})
+        if(invite.length < 1) return res.send({success: false, error: "There is no invite active."})
+        
+        req.invite = invite[0]
+        next()
+    } catch (error) {
+        console.log("middlewares/invite/checkEmailAndActive: ", error)
+        return res.send({success: false, error: error})
+    }
+}
+
 module.exports.checkByParams = async (req, res, next) => {
     if(typeof req.params.inviteId !== "string") return res.send({success: false, error: "email is missing!"})
 
@@ -41,8 +56,11 @@ module.exports.getInvitesList = async (req, res, next) => {
 
     try {
         
-        const invites = await knex('invites').where({orgId: req.user.organization})
-        .select('*') 
+        const invites = await knex('invites')
+        .select('organizations.name as organization', 'invites.*') 
+        .innerJoin('organizations', 'invites.orgId', 'organizations.orgId')
+        .innerJoin('users', 'invites.createdBy', 'users.id')
+        .where({"invites.orgId": req.user.orgId})
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
