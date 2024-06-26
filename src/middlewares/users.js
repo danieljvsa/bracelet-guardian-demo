@@ -84,3 +84,21 @@ module.exports.getUsersList = async (req, res, next) => {
     
     next()
 }
+
+module.exports.checkByParams = async (req, res, next) => {
+    if(typeof req.params.userId !== "string") return res.send({success: false, error: 'Missing email.'})
+    
+    try {
+        const user = await knex('users').where({id: req.params.userId})
+        if (!user.length) {
+            return res.send({success: false, error: 'No User found with this email.'})
+        }
+        req.manager = req.user;
+        req.user = user[0];
+    } catch (error){
+        console.log("middlewares/users/checkByEmail: ", error)
+        return res.send({success: false, error: error})
+    }
+    
+    next()
+}
