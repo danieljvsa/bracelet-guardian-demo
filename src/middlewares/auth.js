@@ -33,6 +33,8 @@ module.exports.validateUser = async (req, res, next) => {
           return res.send({success: false, error: 'That user is not registered'})
         }
 
+        if(!user[0].active) return res.send({success: false, error: "User's account not active."})
+
         req.user = user[0]
         return next()
     })
