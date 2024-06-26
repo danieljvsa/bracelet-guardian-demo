@@ -1,5 +1,4 @@
 const knex = require('../database')
-const {paginate} = require('knex')
 
 module.exports.checkEmailAndActive = async (req, res, next) => {
     if(typeof req.body.email !== "string") return res.send({success: false, error: "email is missing!"})

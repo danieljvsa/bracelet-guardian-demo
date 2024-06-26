@@ -11,6 +11,21 @@ module.exports.get = async (req, res) => {
     return res.send({success: true, data: req.user})
 }
 
+module.exports.delete = async (req, res) => {
+    try {
+        if(!req.manager.isAdmin) return res.send({success: false, error: "Unauthorized action."})
+        const deactivate = await knex("users").update({
+            active: false
+        }).where({
+            id: req.user.id
+        })
+        if(deactivate > 0) return res.send({success: true, data: req.user.id})
+        else return res.send({error: "Couldn't deactivate user."})
+    } catch (error) {
+        
+    }
+}
+
 module.exports.forgotPassword = async (req, res) => {
 
     try {
