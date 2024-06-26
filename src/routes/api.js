@@ -10,6 +10,8 @@ app.route('/users')
 
 app.route('/user/:userId')
     .get(middlewares.users.checkByParams, controllers.users.get)
+    .delete(middlewares.users.checkByParams, controllers.users.delete)
+
 app.route('/invite/:inviteId')
     .get(middlewares.invites.checkByParams, controllers.invites.get)
     .put(middlewares.invites.checkByParams, controllers.invites.update)
