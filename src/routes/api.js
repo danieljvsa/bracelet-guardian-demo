@@ -51,4 +51,14 @@ app.route('/nurse/:nurseId')
 app.route('/nurses')
     .get(middlewares.nurses.getNursesList, controllers.nurses.getAll)
 
+app.route('/bracelet/:patientId')
+    .post(middlewares.patients.checkByParams, middlewares.bracelets.checkDuplicate, controllers.bracelets.create)
+
+app.route('/bracelet/:braceletId')
+    .get(middlewares.bracelets.checkByParams, controllers.bracelets.get)
+    .put(middlewares.bracelets.checkByParams, controllers.bracelets.update)
+
+app.route('/bracelets')
+    .get(middlewares.bracelets.getBraceletsList, controllers.bracelets.getAll)
+
 module.exports = app
