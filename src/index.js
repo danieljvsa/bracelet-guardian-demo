@@ -10,6 +10,7 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use('/auth', routes.auth)
+app.use('/ops/v1', routes.ops)
 app.use('/api/v1', routes.api)
 app.use('/admin', routes.admin)
 
