@@ -26,4 +26,7 @@ app.route('/invite')
 app.route('/invite/resend/:inviteId')
     .get(middlewares.invites.checkByParams, controllers.invites.resend)
 
+app.route('/organizations')
+    .get(middlewares.organizations.checkAdminOrganization, middlewares.organizations.getOrganizationsList, controllers.organizations.getAll)
+
 module.exports = app
