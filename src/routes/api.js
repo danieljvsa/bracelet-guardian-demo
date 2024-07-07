@@ -29,4 +29,15 @@ app.route('/invite/resend/:inviteId')
 app.route('/organizations')
     .get(middlewares.organizations.checkAdminOrganization, middlewares.organizations.getOrganizationsList, controllers.organizations.getAll)
 
+app.route('/patient')
+    .post(middlewares.patients.checkDuplicate, controllers.patients.create)
+
+app.route('/patient/:patientId')
+    .get(middlewares.patients.checkByParams, controllers.patients.get)
+    .put(middlewares.patients.checkByParams, controllers.patients.update)
+    .delete(middlewares.patients.checkByParams, controllers.patients.delete)
+
+app.route('/patients')
+    .get(middlewares.patients.getPatientsList, controllers.patients.getAll)
+
 module.exports = app
