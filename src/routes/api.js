@@ -40,4 +40,15 @@ app.route('/patient/:patientId')
 app.route('/patients')
     .get(middlewares.patients.getPatientsList, controllers.patients.getAll)
 
+app.route('/nurse')
+    .post(middlewares.nurses.checkDuplicate, middlewares.nurses.checkDivision, controllers.nurses.create)
+
+app.route('/nurse/:nurseId')
+    .get(middlewares.nurses.checkByParams, controllers.nurses.get)
+    .put(middlewares.nurses.checkByParams, controllers.nurses.update)
+    .delete(middlewares.nurses.checkByParams, controllers.nurses.delete)
+
+app.route('/nurses')
+    .get(middlewares.nurses.getNursesList, controllers.nurses.getAll)
+
 module.exports = app
