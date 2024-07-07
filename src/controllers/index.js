@@ -1,2 +1,7 @@
 module.exports.users = require('./users')
 module.exports.invites = require('./invites')
+module.exports.organizations = require('./organizations')
+module.exports.alerts = require('./alerts')
+module.exports.patients = require('./patients')
+module.exports.nurses = require('./nurses')
+module.exports.bracelets = require('./bracelets')

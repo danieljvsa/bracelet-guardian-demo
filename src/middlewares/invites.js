@@ -63,7 +63,7 @@ module.exports.getInvitesList = async (req, res, next) => {
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('users').count('* as total');  
+        const totalCount = await knex('invites').count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.invites = {
