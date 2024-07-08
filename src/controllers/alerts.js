@@ -35,7 +35,8 @@ module.exports.create = async (req, res) => {
         await knex('patient_data').insert({
             distance: distance,
             address: address,
-            braceletId: req.bracelet.braceletId
+            braceletId: req.bracelet.braceletId,
+            patientId: req.patient.patientId
         })
         
         await knex('bracelets').where({braceletId: req.bracelet.braceletId}).update({
