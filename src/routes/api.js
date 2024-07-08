@@ -61,6 +61,9 @@ app.route('/bracelet/:braceletId')
 app.route('/bracelets')
     .get(middlewares.bracelets.getBraceletsList, controllers.bracelets.getAll)
 
+app.route('/bracelets/patient/:patientId')
+    .get(middlewares.patients.checkByParams, middlewares.bracelets.getBraceletsByPatient, controllers.bracelets.getAll)
+
 app.route('/alert/:alertId')
     .get(middlewares.alerts.checkByParams, controllers.alerts.get)
 

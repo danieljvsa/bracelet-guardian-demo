@@ -99,3 +99,37 @@ module.exports.checkMacAddressAndPatient = async (req, res, next) => {
 
     next()
 }
+
+module.exports.getBraceletsByPatient = async (req, res, next) => {
+    const page = parseInt(req.query.page) || 1; 
+    const limit = 10; 
+    const offset = (page - 1) * limit; 
+    const sortBy = req.query.sortBy || 'braceletId';  
+    const sortOrder = req.query.sortOrder || 'asc'; 
+
+    try {
+
+        const bracelets = await knex('bracelets')
+        .select('patients.patientName', 'bracelets.*') 
+        .innerJoin('patients', 'bracelets.patientId', 'patients.patientId')
+        .where({"bracelets.patientId": req.patient.patientId})
+        .orderBy(sortBy, sortOrder)
+        .limit(limit) 
+        .offset(offset); 
+        const totalCount = await knex('bracelets').count('* as total');  
+        const totalPages = Math.ceil(totalCount[0].total / limit); 
+        
+        req.bracelets = {
+            data: bracelets, 
+            currentPage: page, 
+            totalPages, 
+            totalCount: totalCount[0].total 
+        }
+        next()
+
+    } catch (error) {
+        console.log("middlewares/bracelets/getBraceletsList: ", error)
+        return res.send({success: false, error: error})
+    }
+
+}
