@@ -28,8 +28,9 @@ module.exports.getAlertsList = async (req, res, next) => {
     try {
         
         const alerts = await knex('alerts')
-        .select('bracelets.imei as imei', 'bracelets.macAddress', 'alerts.*') 
+        .select('patients.patientId', 'patients.patientName', 'bracelets.imei as imei', 'bracelets.macAddress as macAddress', 'alerts.*') 
         .innerJoin('bracelets', 'alerts.braceletId', 'bracelets.braceletId')
+        .innerJoin('patients', 'alerts.patientId', 'patients.patientId')
         .where({"alerts.braceletId": req.bracelet.braceletId})
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
@@ -61,13 +62,10 @@ module.exports.getAlertsByPatient = async (req, res, next) => {
 
     try {
 
-        const bracelets = await knex('bracelets').where({patientId: req.patient.patientId})
-        if(!bracelets.length) return res.send({success: true, data: { data: [], currentPage: 0, totalPages: 0, totalCount: "0" }})
-        
         const alerts = await knex('alerts')
         .select('bracelets.imei as imei', 'bracelets.macAddress', 'alerts.*') 
         .innerJoin('bracelets', 'alerts.braceletId', 'bracelets.braceletId')
-        .whereIn({"alerts.braceletId": bracelets.map(r => r.braceletId)})
+        .where({"alerts.patientId": req.patient.patientId})
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
