@@ -16,6 +16,6 @@ app.route('/organizations')
     .get(middlewares.organizations.getOrganizationsList, controllers.organizations.getAll)
 
 app.route('/organization/generate/key/:orgId')
-    put(middlewares.organizations.checkByParams)
+    put(middlewares.organizations.checkByParams, controllers.organizations.generateApiKey)
 
 module.exports = app
