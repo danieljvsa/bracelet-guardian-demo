@@ -61,10 +61,23 @@ module.exports.generateApiKey = async (req, res) => {
         const key = await logic.master.generateUUID()
         if(!key.success) return res.send(key)
 
-        const hashKey = await logic.master.hashNumber(key)
+        const hashKey = await logic.master.hashNumber(key.data)
         if(!hashKey.success) return res.send(hashKey)
 
-        await knex('organizations').update({apiKey: hashKey}).where({orgId: req.org.orgId})
+        mailer.sendMail({
+            to: req.user.email,
+            from: process.env.NODE_USER,
+            template: 'organizations/apiKey',
+            subject: 'New API Key',
+            context: {token: key.data}
+        }, (err) => {
+            if (err) {
+                console.log("controllers/users/generateApiKey/sendEmail: ", err)
+                return res.send({success: false, error: 'Cannot send apiKey'})
+            }
+        })
+
+        await knex('organizations').update({apiKey: hashKey.data}).where({orgId: req.org.orgId})
         .catch((error) => {
             console.log("controllers/organizations/generateApiKey", error)
             return res.send({success: false, error})
