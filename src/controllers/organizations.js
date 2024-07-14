@@ -1,5 +1,6 @@
 const knex = require('../database');
 const logic = require('../logic')
+const mailer = require('../modules/mailer')
 
 module.exports.get = async (req, res) => {
     return res.send({success: true, data: req.org})
@@ -16,17 +17,13 @@ module.exports.create = async (req, res) => {
     try {
         await knex('organizations').insert({
             name: name,
-            email: email,
-            orgId: orgId,
-            active: true,
-            isAdmin: (org[0].code === "admin") ? true : false,
-            createdBy: req.user.id
+            code: code
         })
 
         const org = await knex('organizations').where({name: name, code: code})
         if(!org.length) return res.send({success: false, error: "Organization not created."})
         
-        return res.send({success: true, data: org[0].id})
+        return res.send({success: true, data: org[0].orgId})
     } catch (error) {
         console.log("controllers/organizations/create: ", error)
         return res.send({success: false, error: error})
@@ -43,12 +40,12 @@ module.exports.update = async (req, res) => {
             name: name ? name : req.org.name, 
             code: code ? code : req.org.code
         })
-        .where({id: req.org.id}) 
+        .where({orgId: req.org.orgId}) 
         .catch((error) => {
             console.log("controllers/organizations/update", error)
             return res.send({success: false, error})
         })
-        return res.send({success: true, data: req.org.id})
+        return res.send({success: true, data: req.org.orgId})
     } catch (error) {
         console.log("controllers/organizations/update: ", error)
         return res.send({success: false, error: error})
@@ -63,9 +60,9 @@ module.exports.generateApiKey = async (req, res) => {
 
         const hashKey = await logic.master.hashNumber(key.data)
         if(!hashKey.success) return res.send(hashKey)
-
+        console.log(req.manager.email)
         mailer.sendMail({
-            to: req.user.email,
+            to: req.manager.email,
             from: process.env.NODE_USER,
             template: 'organizations/apiKey',
             subject: 'New API Key',
@@ -83,7 +80,7 @@ module.exports.generateApiKey = async (req, res) => {
             return res.send({success: false, error})
         })
         
-        return res.send({success: true, data: req.org.id})
+        return res.send({success: true, data: req.org.orgId})
     } catch (error) {
         console.log("controllers/organizations/generateApiKey: ", error)
         return res.send({success: false, error: error})
