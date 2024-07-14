@@ -4,7 +4,7 @@ module.exports.checkByParams = async (req, res, next) => {
     if(typeof req.params.orgId !== "string") return res.send({success: false, error: 'Missing orgId.'})
     
     try {
-        const org = await knex('organizations').where({id: req.params.orgId})
+        const org = await knex('organizations').where({orgId: req.params.orgId})
         if (!org.length) return res.send({success: false, error: 'No Organization found.'})
         
         req.org = org[0];
@@ -21,7 +21,7 @@ module.exports.checkDuplicate = async (req, res, next) => {
     if(typeof code !== "string") return res.send({success: false, error: "Missing code."})
 
     try {
-
+        console.log(code)
         const org = await knex('organizations').where({code: code})
         if (org.length > 0) return res.send({success: false, error: 'Organization already exists.'})
         
@@ -36,7 +36,7 @@ module.exports.getOrganizationsList = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1; 
     const limit = 10; 
     const offset = (page - 1) * limit; 
-    const sortBy = req.query.sortBy || 'id';  
+    const sortBy = req.query.sortBy || 'orgId';  
     const sortOrder = req.query.sortOrder || 'asc'; 
 
     try {
@@ -67,7 +67,7 @@ module.exports.checkAdminOrganization = async (req, res, next) => {
     
     try {
 
-        const org = await knex('organizations').where({id: req.user.orgId})
+        const org = await knex('organizations').where({orgId: req.user.orgId})
         if (!org.length) return res.send({success: false, error: 'No Organization found.'})
         if (org[0].code !== "admin") return res.send({success: true, data: {
             data: org[0], 
