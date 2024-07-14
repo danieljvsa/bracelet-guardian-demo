@@ -114,37 +114,37 @@ module.exports.create = async (req, res, next) =>{
             name: req.invite.name,
             isAdmin: req.invite.isAdmin,
             orgId: req.invite.orgId,
-            active: true,
-            password: password
+            active: true
         }
 
-        bcrypt.genSalt(10, (err, salt) => {
-            bcrypt.hash(password, salt, async (err, hash) => {
+        await bcrypt.genSalt(10, async (err, salt) => {
+            await bcrypt.hash(password, salt, async (err, hash) => {
                 if (err) return res.send({success: false, error: err});
                 //console.log(hash)
                 const hashedPassword = hash;
                 console.log(hashedPassword)
                 newUser.password = hashedPassword
-                //await knex('users').insert({...newUser, password: hashedPassword})
+                await knex('users').insert({...newUser, password: hashedPassword})
+                
+                await knex('invites').where({id: req.invite.id}).update({active: false})
+                
+                console.log(newUser.password)
+                const user = await knex('users').where({email: req.invite.email, name: req.invite.name, active: true})
+                if(!user.length) return res.send({success: false, error: "User not created."})
+                
+                const token = await logic.master.generateToken({ id: user[0].id })
+                if(!token.success) res.send(token)
+        
+                const login = {
+                    email: user[0].email,
+                    name: user[0].name, 
+                    token: token.data
+                }
+        
+                return res.send({success: true, data: login})
             })
         })
 
-        await knex('invites').where({id: req.invite.id}).update({active: false})
-        
-        await knex('users').insert(newUser)
-        const user = await knex('users').where({email: req.invite.email, name: req.invite.name, active: true})
-        if(!user.length) return res.send({success: false, error: "User not created."})
-        
-        const token = await logic.master.generateToken({ id: user[0].id })
-        if(!token.success) res.send(token)
-
-        const login = {
-            email: user[0].email,
-            name: user[0].name, 
-            token: token.data
-        }
-
-        return res.send({success: true, data: login})
     } catch (error) {
         console.log("controllers/users/resetPassword: ", error)
         return res.send({success: false, error})
