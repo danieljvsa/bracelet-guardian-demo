@@ -18,6 +18,7 @@ module.exports.create = async (req, res) => {
         await knex('patients').insert({
             patientName: name,
             age: age,
+            orgId: req.user.orgId
         })
 
         const patient = await knex('patients').where({
@@ -59,7 +60,7 @@ module.exports.update = async (req, res) => {
 
 module.exports.delete = async (req, res) => {
     try { 
-        await knex('patients').where('patientId', 1).del(); 
+        await knex('patients').where('patientId', req.patient.patientId).del(); 
         
         return res.send({success: true, data: req.patient.patientId})
     } catch (error) { 

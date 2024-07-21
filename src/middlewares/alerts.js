@@ -1,24 +1,24 @@
 const knex = require('../database')
 
 module.exports.checkByParams = async (req, res, next) => {
-    if(typeof req.params.braceletId !== "string") return res.send({success: false, error: "nurseId is missing!"})
+    if(typeof req.params.alertId !== "string") return res.send({success: false, error: "nurseId is missing!"})
 
     try {
         
-        const bracelet = await knex('bracelets').where({id: req.params.braceletId})
-        if(!bracelet.length) return res.send({success: false, error: "No bracelet registered."})
+        const alert = await knex('alerts').where({alertId: req.params.alertId})
+        if(!alert.length) return res.send({success: false, error: "No alert registered."})
         
-        req.bracelet = bracelet[0]
+        req.alert = alert[0]
         next()
 
     } catch (error) {
-        console.log("middlewares/bracelets/checkByParams: ", error)
+        console.log("middlewares/alerts/checkByParams: ", error)
         return res.send({success: false, error: error})
     }
 
 }
 
-module.exports.getAlertsList = async (req, res, next) => {
+module.exports.getAlertsListByBracelet = async (req, res, next) => {
     const page = parseInt(req.query.page) || 1; 
     const limit = 10; 
     const offset = (page - 1) * limit; 
@@ -69,7 +69,7 @@ module.exports.getAlertsByPatient = async (req, res, next) => {
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('alerts').whereIn({"alerts.braceletId": bracelets.map(r => r.braceletId)}).count('* as total');  
+        const totalCount = await knex('alerts').where({"alerts.patientId": req.patient.patientId}).count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.alerts = {

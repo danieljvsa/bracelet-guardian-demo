@@ -1,11 +1,11 @@
 const knex = require('../database');
 
 module.exports.get = async (req, res) => {
-    return res.send({success: true, data: req.bracelt})
+    return res.send({success: true, data: req.bracelet})
 }
 
 module.exports.getAll = async (req, res) => {
-    return res.send({success: true, data: req.bracelts})
+    return res.send({success: true, data: req.bracelets})
 }
 
 module.exports.create = async (req, res) => {
@@ -50,14 +50,14 @@ module.exports.update = async (req, res) => {
             patientId: (patient.length) ? patient[0].patientId : req.bracelet.patientId,
             battery: battery ? battery : req.bracelet.battery,
             port: port ? port : req.bracelet.port
-        }).where({patientId: req.bracelet.patientId})
+        }).where({braceletId: req.bracelet.braceletId})
 
-        const bracelet = await knex('bracelets').where({macAddress: macAddress})
-        if(!bracelet.length) return res.send({success: false, error: "Bracelet not created."})
+        const bracelet = await knex('bracelets').where({braceletId: req.bracelet.braceletId})
+        if(!bracelet.length) return res.send({success: false, error: "Bracelet not found."})
         
         return res.send({success: true, data: bracelet[0].braceletId})
     } catch (error) {
-        console.log("controllers/bracelets/create: ", error)
+        console.log("controllers/bracelets/update: ", error)
         return res.send({success: false, error: error})
     }
 }

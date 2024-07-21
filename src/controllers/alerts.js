@@ -32,9 +32,10 @@ module.exports.create = async (req, res) => {
             }
         })
 
-        await knex('patient_data').insert({
+        await knex('alerts').insert({
             distance: distance,
             address: address,
+            active: true,
             braceletId: req.bracelet.braceletId,
             patientId: req.patient.patientId
         })
