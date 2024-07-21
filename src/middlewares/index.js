@@ -1,3 +1,8 @@
 module.exports.auth = require('./auth') 
 module.exports.invites = require('./invites')
 module.exports.users = require('./users')
+module.exports.organizations = require('./organizations')
+module.exports.patients = require('./patients')
+module.exports.bracelets = require('./bracelets')
+module.exports.nurses = require('./nurses')
+module.exports.alerts = require('./alerts')

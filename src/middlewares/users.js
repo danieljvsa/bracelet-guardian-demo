@@ -67,7 +67,7 @@ module.exports.getUsersList = async (req, res, next) => {
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('users').count('* as total');  
+        const totalCount = await knex('users').where({"users.orgId": req.user.orgId}).where({"users.orgId": req.user.orgId}).count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.users = {
@@ -79,6 +79,24 @@ module.exports.getUsersList = async (req, res, next) => {
         
     } catch (error) {
         console.log("middlewares/users/getUsersList: ", error)
+        return res.send({success: false, error: error})
+    }
+    
+    next()
+}
+
+module.exports.checkByParams = async (req, res, next) => {
+    if(typeof req.params.userId !== "string") return res.send({success: false, error: 'Missing userId.'})
+    
+    try {
+        const user = await knex('users').where({id: req.params.userId})
+        if (!user.length) {
+            return res.send({success: false, error: 'No User found with this email.'})
+        }
+        req.manager = req.user;
+        req.user = user[0];
+    } catch (error){
+        console.log("middlewares/users/checkByParams: ", error)
         return res.send({success: false, error: error})
     }
     

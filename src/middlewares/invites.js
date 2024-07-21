@@ -1,5 +1,4 @@
 const knex = require('../database')
-const {paginate} = require('knex')
 
 module.exports.checkEmailAndActive = async (req, res, next) => {
     if(typeof req.body.email !== "string") return res.send({success: false, error: "email is missing!"})
@@ -64,7 +63,7 @@ module.exports.getInvitesList = async (req, res, next) => {
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('users').count('* as total');  
+        const totalCount = await knex('invites').count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.invites = {

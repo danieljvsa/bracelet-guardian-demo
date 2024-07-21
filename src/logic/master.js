@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 module.exports.generateRandomNumber = async () => { 
     try {   
@@ -40,6 +41,28 @@ module.exports.generateToken = async (params = {}) => {
         return {success: true, data: token}
     } catch (error) {
         console.log("logic/master/generateToken: ", error)
+        return {success: true, error}
+    }
+}
+
+module.exports.generateUUID = async () => {
+    try{
+        const uuid = await crypto.randomUUID()
+        return {success: true, data: uuid}
+    } catch (error) {
+        console.log("logic/master/generateUUID: ", error)
+        return {success: true, error}
+    }
+}
+
+module.exports.checkMacAddress = async (macAddress) => {
+    let MACRegex = new RegExp("^([0-9a-fA-F][0-9a-fA-F]:){5}([0-9a-fA-F][0-9a-fA-F])$");
+
+    try {
+        const result = MACRegex.test(macAddress)
+        return {success: true, data: result}
+    } catch (error) {
+        console.log("logic/master/checkMacAddress: ", error)
         return {success: true, error}
     }
 }
