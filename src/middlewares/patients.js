@@ -5,7 +5,7 @@ module.exports.checkByParams = async (req, res, next) => {
 
     try {
         
-        const patient = await knex('patients').where({id: req.params.patientId})
+        const patient = await knex('patients').where({patientId: req.params.patientId})
         if(!patient.length) return res.send({success: false, error: "No patient registered."})
         
         req.patient = patient[0]

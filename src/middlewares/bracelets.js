@@ -6,7 +6,7 @@ module.exports.checkByParams = async (req, res, next) => {
 
     try {
         
-        const bracelet = await knex('bracelets').where({id: req.params.braceletId})
+        const bracelet = await knex('bracelets').where({braceletId: req.params.braceletId})
         if(!bracelet.length) return res.send({success: false, error: "No bracelet registered."})
         
         req.bracelet = bracelet[0]
@@ -30,15 +30,15 @@ module.exports.getBraceletsList = async (req, res, next) => {
 
         const patients = await knex('patients').where({orgId: req.user.orgId})
         if(!patients.length) return res.send({success: true, data: { data: [], currentPage: 0, totalPages: 0, totalCount: "0" }})
-        
+        console.log(patients.map(r => r.patientId))
         const bracelets = await knex('bracelets')
         .select('patients.patientName as patientName', 'bracelets.*') 
         .innerJoin('patients', 'bracelets.patientId', 'patients.patientId')
-        .whereIn({"bracelets.patientId": patients.map(r => r.patientId)})
+        .whereIn("bracelets.patientId", patients.map(r => r.patientId))
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('bracelets').count('* as total');  
+        const totalCount = await knex('bracelets').whereIn("bracelets.patientId", patients.map(r => r.patientId)).count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.bracelets = {
@@ -116,7 +116,7 @@ module.exports.getBraceletsByPatient = async (req, res, next) => {
         .orderBy(sortBy, sortOrder)
         .limit(limit) 
         .offset(offset); 
-        const totalCount = await knex('bracelets').count('* as total');  
+        const totalCount = await knex('bracelets').where({"bracelets.patientId": req.patient.patientId}).count('* as total');  
         const totalPages = Math.ceil(totalCount[0].total / limit); 
         
         req.bracelets = {

@@ -38,6 +38,7 @@ module.exports.validateUser = async (req, res, next) => {
         if (!org.length) return res.send({success: false, error: 'No Organization found.'})
 
         if(org[0].apiKey !== null){
+            if(typeof req.headers.apikey !== "string") return res.send({success: false, error: "Missing Api Key."})
             const compareApiKey = await logic.master.comparePassword(req.headers.apikey, org[0].apiKey)
             if(!compareApiKey.success) return res.send(compareApiKey)
             if(!compareApiKey.data) return res.send({success: false, error: "Unauthorized"})
