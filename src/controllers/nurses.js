@@ -9,13 +9,15 @@ module.exports.getAll = async (req, res) => {
 }
 
 module.exports.create = async (req, res) => {
-    const {name, division, phone} = req.body
+    const {name, division, phone, service, email} = req.body
     try {
         
         await knex('nurses').insert({
             nurseName: name,
             phone: phone,
             division: division,
+            service: (service) ? service : "",
+            email: (email) ? email : "",
             orgId: req.user.orgId
         })
 
@@ -33,7 +35,7 @@ module.exports.create = async (req, res) => {
 }
 
 module.exports.update = async (req, res) => {
-    const { name, division, phone } = req.body;
+    const { name, division, phone, service, email } = req.body;
 
     try {
         const divisionAvailable = ["front", "end"]
@@ -43,7 +45,9 @@ module.exports.update = async (req, res) => {
         .update({ 
             nurseName: name ? name : req.nurse.nurseName, 
             phone: phone ? phone : req.nurse.phone,
-            division: division ? division : req.nurse.division
+            division: division ? division : req.nurse.division,
+            service: service ? service : req.nurse.service,
+            email: email ? email : req.nurse.email
         })
         .where({nurseId: req.nurse.nurseId}) 
         .catch((error) => {
