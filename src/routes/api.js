@@ -73,4 +73,7 @@ app.route('/alerts/bracelet/:braceletId')
 app.route('/alerts/patient/:patientId')
     .get(middlewares.patients.checkByParams, middlewares.alerts.getAlertsByPatient, controllers.alerts.getAll)
 
+app.route('/alerts')
+    .get(middlewares.alerts.getAlertsList, controllers.alerts.getAll)
+
 module.exports = app
