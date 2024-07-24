@@ -2,6 +2,7 @@ const knex = require('../database');
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const client = require('twilio')(accountSid, authToken);
+const mailer = require('../modules/mailer')
 
 module.exports.get = async (req, res) => {
     return res.send({success: true, data: req.alert})
@@ -23,11 +24,27 @@ module.exports.create = async (req, res) => {
         await knex('nurses').where({orgId: req.patient.orgId}).then((data) => {
             console.log(data)
             for (let index = 0; index < data.length; index++) {
-                client.messages.create({
-                    body: 'Alert: ' + req.patient.patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena. Its room ' + address + '.',
-                    from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
-                    to: 'whatsapp:' + data[index].phone
-                }).then().done();
+                if(!data[index].service || data[index].service === "whatsapp"){
+                    client.messages.create({
+                        body: 'Alert: ' + req.patient.patientName + ' has fallen at ' + time + ' of ' + date + ' at ' + distance + ' meters from antena. Its room ' + address + '.',
+                        from: 'whatsapp:' + process.env.TWILIO_WHATSAPP ,
+                        to: 'whatsapp:' + data[index].phone
+                    }).then().done();
+                } else if(data[index].service === "email" && data[index].email){
+                    mailer.sendMail({
+                        to: data[index].email,
+                        from: process.env.NODE_USER,
+                        template: 'alerts/alert',
+                        subject: 'Alert for ' + req.patient.patientName,
+                        context: {
+                            patientName: req.patient.patientName,
+                            time: time,
+                            date: date,
+                            distance: distance,
+                            address: address
+                        }
+                    })
+                }
                 
             }
         })
