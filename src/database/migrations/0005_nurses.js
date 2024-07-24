@@ -5,6 +5,8 @@ exports.up = function(knex) {
       table.string('nurseName').notNullable();
       table.string('phone').notNullable();
       table.string('division').notNullable();
+      table.string('service')
+      table.string('email')
       table.timestamp('created_at').defaultTo(knex.fn.now());
       table.timestamp('updated_at').defaultTo(knex.fn.now());
       table.integer('orgId').unsigned().index().references('orgId').inTable('organizations');
