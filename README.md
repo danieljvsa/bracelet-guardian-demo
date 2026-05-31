@@ -1,100 +1,279 @@
 # Bracelet Guardian Demo
 
-Demo API to serve as an intermediate between bracelet software and web administration.
+A wearable IoT monitoring platform designed to bridge smart bracelet devices and web administration systems, enabling real-time tracking, alert management, and centralized device supervision.
 
-## Table of Contents
+---
 
-- [About](#about)
-- [Features](#features)
-- [Technologies](#technologies)
-- [Setup](#setup)
-- [Usage](#usage)
-- [License](#license)
+## Overview
 
-## About
+Bracelet Guardian Demo is a proof-of-concept platform that acts as an intermediary between wearable bracelet devices and a web-based administration interface.
 
-The Bracelet Guardian Demo is designed to facilitate communication between bracelet devices and a web-based administration interface. It acts as a middleware, ensuring seamless data exchange and management.
+The system receives data from connected devices, processes and stores it, and exposes APIs that allow administrators to monitor bracelet activity, manage users, and respond to alerts.
 
-## Features
+This project demonstrates the integration of:
 
-- Middleware API for bracelet devices
-- Integration with web administration platforms
-- Built with Node.js and Express.js
-- Utilizes PostgreSQL for data storage
-- Dockerized for easy deployment
+* IoT devices
+* REST APIs
+* Real-time monitoring
+* PostgreSQL persistence
+* SMS notifications
+* Containerized deployment
 
-## Technologies
+---
 
-This project leverages the following technologies:
+## Key Features
 
-- [Node.js](https://nodejs.org/)
-- [Express.js](https://expressjs.com/)
-- [PostgreSQL](https://www.postgresql.org/)
-- [Knex.js](http://knexjs.org/)
-- [Docker](https://www.docker.com/)
-- [Twilio](https://www.twilio.com/)
+### Device Communication
 
-## Setup
+* Receive data from wearable bracelet devices
+* Process and validate incoming information
+* Centralized communication layer
 
-To set up the project locally:
+### Monitoring & Management
 
-1. **Clone the repository:**
+* User and bracelet management
+* Device status monitoring
+* Historical data storage
+* Activity tracking
 
-   ```bash
-   git clone https://github.com/danieljvsa/bracelet-guardian-demo.git
-   ```
+### Notifications
 
-2. **Navigate to the project directory:**
+* SMS alert integration through Twilio
+* Event-driven notifications
+* Emergency communication workflows
 
-   ```bash
-   cd bracelet-guardian-demo
-   ```
+### Infrastructure
 
-3. **Install dependencies:**
+* RESTful API architecture
+* PostgreSQL database
+* Dockerized deployment
+* Environment-based configuration
 
-   ```bash
-   npm install
-   ```
+---
 
-4. **Set up the database:**
+## Architecture
 
-   Ensure you have PostgreSQL installed and running. Update the `knexfile.js` with your database configuration.
+```text
++--------------------+
+| Smart Bracelet     |
++---------+----------+
+          |
+          v
++--------------------+
+| Bracelet Guardian  |
+| API                |
++---------+----------+
+          |
+          +------------------+
+          |                  |
+          v                  v
++----------------+   +----------------+
+| PostgreSQL     |   | Twilio SMS     |
+| Data Storage   |   | Notifications  |
++----------------+   +----------------+
+          |
+          v
++--------------------+
+| Web Administration |
+| Dashboard          |
++--------------------+
+```
 
-   ```javascript
-   module.exports = {
-     development: {
-       client: 'postgresql',
-       connection: {
-         database: 'your_database_name',
-         user: 'your_database_user',
-         password: 'your_database_password'
-       },
-       migrations: {
-         tableName: 'knex_migrations'
-       }
-     }
-   };
-   ```
+---
 
-5. **Run migrations:**
+## Technology Stack
 
-   ```bash
-   npx knex migrate:latest
-   ```
+### Backend
 
-6. **Start the application:**
+* Node.js
+* Express.js
 
-   ```bash
-   npm start
-   ```
+### Database
 
-   The API should now be running on `http://localhost:3000`.
+* PostgreSQL
+* Knex.js
 
-## Usage
+### Notifications
 
-After setting up and starting the application, you can interact with the API endpoints to manage bracelet data and integrate with the web administration interface. Refer to the source code and comments for detailed information on available endpoints and their usage.
+* Twilio
+
+### Infrastructure
+
+* Docker
+* Docker Compose
+
+---
+
+## Use Cases
+
+### Elderly Monitoring
+
+Track activity and send alerts when abnormal situations occur.
+
+### Lone Worker Safety
+
+Monitor workers operating in remote or hazardous environments.
+
+### Healthcare Monitoring
+
+Receive bracelet-generated events and trigger notifications.
+
+### Educational Demonstration
+
+Showcase IoT-to-cloud communication patterns and wearable integrations.
+
+---
+
+## Project Structure
+
+```text
+bracelet-guardian-demo/
+├── src/
+│   ├── controllers/
+│   ├── routes/
+│   ├── services/
+│   ├── middleware/
+│   ├── database/
+│   └── integrations/
+├── migrations/
+├── docker/
+├── knexfile.js
+├── package.json
+└── README.md
+```
+
+---
+
+## Getting Started
+
+### Clone Repository
+
+```bash
+git clone https://github.com/danieljvsa/bracelet-guardian-demo.git
+
+cd bracelet-guardian-demo
+```
+
+### Install Dependencies
+
+```bash
+npm install
+```
+
+### Configure Environment
+
+Create a `.env` file:
+
+```env
+PORT=3000
+
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=bracelet_guardian
+DB_USER=postgres
+DB_PASSWORD=password
+
+TWILIO_ACCOUNT_SID=your_sid
+TWILIO_AUTH_TOKEN=your_token
+TWILIO_PHONE_NUMBER=your_number
+```
+
+### Configure Database
+
+Update `knexfile.js` if required.
+
+Run migrations:
+
+```bash
+npx knex migrate:latest
+```
+
+### Start Application
+
+```bash
+npm start
+```
+
+The API will be available at:
+
+```text
+http://localhost:3000
+```
+
+---
+
+## Docker Deployment
+
+Build image:
+
+```bash
+docker build -t bracelet-guardian-demo .
+```
+
+Run container:
+
+```bash
+docker run -p 3000:3000 bracelet-guardian-demo
+```
+
+---
+
+## Example Workflow
+
+1. Bracelet sends telemetry or alert event
+2. API receives and validates request
+3. Data is stored in PostgreSQL
+4. Business rules are executed
+5. Twilio sends notification if required
+6. Web administration interface displays updated information
+
+---
+
+## Future Improvements
+
+* [ ] Real-time WebSocket communication
+* [ ] MQTT support
+* [ ] Device geolocation tracking
+* [ ] Alert escalation workflows
+* [ ] Mobile application
+* [ ] Event streaming with Kafka
+* [ ] Device firmware management
+* [ ] Dashboard and analytics
+* [ ] Role-based access control
+* [ ] Multi-device support
+
+---
+
+## Learning Objectives
+
+This project was developed to explore:
+
+* IoT device integrations
+* Wearable technology communication
+* REST API design
+* PostgreSQL data modeling
+* SMS notification systems
+* Containerized deployments
+* Event-driven workflows
+
+---
+
+## Author
+
+Daniel Sá
+
+Back-End Engineer focused on scalable systems, IoT platforms, backend architecture, and intelligent transportation solutions.
+
+### Links
+
+GitHub:
+https://github.com/danieljvsa
+
+Portfolio:
+https://danieljvsa.vercel.app
+
+---
 
 ## License
 
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
-
+MIT License
